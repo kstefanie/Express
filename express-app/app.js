@@ -21,12 +21,26 @@ app.use(express.static('./public'));
 app.use(express.responseTime());
 // Expliciyly add the router middleware
 app.use(app.router);
-// Add the errorHandler middleware
-app.use(express.errorHandler());
 
+
+// Setup for production environment
+if ('production' === app.get('env')) {
+	app.get('/', function(req, res) {
+		res.render('index', {title:config.title, message:config.message});
+	});
+}
+
+// Setup for development environment
+if ('development' === app.get('env')) {
+	// Add the errorHandler middleware
+	app.use(express.errorHandler());
+	app.get('/', function(req, res) {
+		res.send('development mode test');
+	});
+}
 // A route for the home page - will render a view
-app.get('/', function(req, res) {
-	res.render('index', {title:config.title, message:config.message});
+app.get('/test', function(req, res) {
+	res.send('works on all environment');
 });
 
 // A route for /say-hello - will render a view
@@ -44,5 +58,5 @@ app.get('/fail', function(req, res){
 
 //start the app
 http.createServer(app).listen(3000, function() {
-	console.log('App started');
+	console.log('App started on port ' + config.port);
 });
