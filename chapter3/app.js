@@ -9,7 +9,10 @@ var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 
+// Load BEFORE app is instantiated
 var namespace = require('express-namespace');
+var resouce = require('express-resource');
+
 var app = express();
 
 // all environments
@@ -31,7 +34,6 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/users', user.list);
 
 app.namespace('/articles', function() {
 
@@ -62,6 +64,8 @@ app.namespace('/articles', function() {
 		});
 	});
 });
+
+app.resource('users', require('./users.js'));
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
