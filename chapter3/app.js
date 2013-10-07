@@ -9,6 +9,7 @@ var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 
+var namespace = require('express-namespace');
 var app = express();
 
 // all environments
@@ -31,6 +32,36 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+
+app.namespace('/articles', function() {
+
+	app.get('/', function(req, res) {
+		res.send('index of articles');
+	});
+
+	app.get('/new', function(req, res) {
+		res.send('new article');
+	});
+
+	app.get('/edit/:id', function(req, res) {
+		res.send('edit article ' + req.params.id);
+	});
+
+	app.get('/2013', function(req, res) {
+		res.send('articles from 2013');
+	});
+
+	// Namespaces can be nested
+	app.namespace('/2013/jan', function() {
+		app.get('/', function(req, res) {
+			res.send('articles from Jan 2013');
+		});
+
+		app.get('/nodejs', function(req, res) {
+			res.send('articles about Node from jan 2013');
+		});
+	});
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
